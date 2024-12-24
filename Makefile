@@ -11,10 +11,10 @@ all: VocoderSynth.so libxputty/Build/libxputty.a
 VocoderSynth.so:$(OBJECTS)
 	gcc -shared -o VocoderSynth.so $(OBJECTS) -lm
 
-xputty:libxputty/Makefile
+libxputty/Makefile:
 	git submodule update --init --recursive
 	
-libxputty/Build/libxputty.a:xputty
+libxputty/Build/libxputty.a:libxputty/Makefile
 	make -C libxputty
 
 DCRemove.o:DCRemove.cpp
