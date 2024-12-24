@@ -6,9 +6,17 @@ Vocoder.cpp VocoderSynth.cpp
 
 OBJECTS=$(SOURCES:.cpp=.o)
 
+all: VocoderSynth.so libxputty/Build/libxputty.a
+
 VocoderSynth.so:$(OBJECTS)
 	gcc -shared -o VocoderSynth.so $(OBJECTS) -lm
-    
+
+xputty:libxputty/Makefile
+	git submodule update --init --recursive
+	
+libxputty/Build/libxputty.a:xputty
+	make -C libxputty
+
 DCRemove.o:DCRemove.cpp
 
 FIRFilter.o:FIRFilter.cpp
