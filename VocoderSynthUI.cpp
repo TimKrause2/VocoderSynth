@@ -10,7 +10,7 @@
 enum CtlTypes
 {
     CTYPE_KNOB,
-    CTYPE_CBUTTON,
+    CTYPE_BUTTON,
 };
 
 struct CtlProps
@@ -33,69 +33,87 @@ struct CtlProps
 CtlProps ctlProps[CONTROL_NCONTROLS] =
 {
     {
-        CTYPE_CBUTTON, PORT_CONTROL + CONTROL_RAW_ENABLE,
+        CTYPE_BUTTON, PORT_CONTROL + CONTROL_RAW_ENABLE,
         "Raw Enable",
-        0, 0, 100, 50,
+        0, 0, 120, 30,
         0.0f, 1.0f, 0.0f, 0.0f, 0.0f, CL_CONTINUOS
     },
     {
-        CTYPE_CBUTTON, PORT_CONTROL + CONTROL_VOICE_ENABLE,
+        CTYPE_BUTTON, PORT_CONTROL + CONTROL_VOICE_ENABLE,
         "Voice Enable",
-        100, 0, 100, 50,
+        120, 0, 120, 30,
         0.0f, 0.0f, 0.0f, 0.0f, 0.0f, CL_CONTINUOS
     },
     {
         CTYPE_KNOB, PORT_CONTROL + CONTROL_VOICE_IMPULSE_GAIN,
         "Impulse Gain",
-        100, 50, 50, 50,
+        120, 50, 60, 80,
         20.0f, 20.0f, 0.0f, 30.0f, 0.001f, CL_CONTINUOS
     },
     {
         CTYPE_KNOB, PORT_CONTROL + CONTROL_VOICE_NOISE_GAIN,
         "Noise Gain",
-        150, 50, 50, 50,
+        180, 50, 60, 80,
         0.0f, 0.0f, -30.0f, 0.0f, 0.001f, CL_CONTINUOS
     },
     {
         CTYPE_KNOB, PORT_CONTROL + CONTROL_VOICE_PITCH_OFFSET,
         "Pitch Shift",
-        125, 100, 50, 50,
+        150, 130, 60, 80,
         0.0f, 0.0f, -12.0f, 12.0f, 0.01f, CL_CONTINUOS
     },
     {
-        CTYPE_CBUTTON, PORT_CONTROL + CONTROL_SYNTH_ENABLE,
+        CTYPE_BUTTON, PORT_CONTROL + CONTROL_SYNTH_ENABLE,
         "Synth Enable",
-        200, 0, 100, 50,
+        240, 0, 120, 30,
         0.0f, 0.0f, 0.0f, 0.0f, 0.0f, CL_CONTINUOS
     },
     {
         CTYPE_KNOB, PORT_CONTROL + CONTROL_SYNTH_GAIN,
         "Synth Gain",
-        200, 50, 50, 50,
+        240, 50, 60, 80,
         20.0f, 20.0f, 0.0f, 30.0f, 0.001f, CL_CONTINUOS
     },
     {
         CTYPE_KNOB, PORT_CONTROL + CONTROL_SYNTH_BEND_RANGE,
         "Pitch Bend",
-        250, 50, 50, 50,
+        300, 50, 60, 80,
         0.0f, 0.0f, 0.0f, 12.0f, 0.01f, CL_CONTINUOS
     }
 };
 
+struct LblProps
+{
+    const char *label;
+    int x,y,width,height;
+};
 
+#define N_LABELS 3
 
-
-
-
+LblProps lblProps[N_LABELS] =
+{
+    {
+        "Raw Enable", 0, 30, 120, 20
+    },
+    {
+        "Voice Enable", 120, 30, 120, 20
+    },
+    {
+        "Synth Enable", 240, 30, 120, 20
+    }
+};
 
 VocoderSynthUI::VocoderSynthUI (LV2UI_Write_Function write_function, LV2UI_Controller controller, void* parentXWindow, std::string bundlePath):
     write_function(write_function),
     controller(controller)
 {
     main_init (&main);
-    box = create_window (&main, reinterpret_cast<Window>(parentXWindow), 0, 0, 300, 150);
+    set_colors(&main);
+    main.normal_font = 10;
+    box = create_window (&main, reinterpret_cast<Window>(parentXWindow), 0, 0, 360, 210);
     box->parent_struct = this;
     box->label = "VocoderSynth";
+    box->func.expose_callback = exposeCallback;
 
     for(int i=0;i<CONTROL_NCONTROLS;i++){
         CtlProps *p = &ctlProps[i];
@@ -105,8 +123,8 @@ VocoderSynthUI::VocoderSynthUI (LV2UI_Write_Function write_function, LV2UI_Contr
             set_adjustment(controls[i]->adj,
                 p->std_value, p->value, p->min_value, p->max_value,
                 p->step, p->cl_type);
-        }else if(p->ctlType==CTYPE_CBUTTON){
-            controls[i] = add_check_button(box,
+        }else if(p->ctlType==CTYPE_BUTTON){
+            controls[i] = add_on_off_button(box,
                 p->label, p->x, p->y, p->width, p->height);
             adj_set_value(controls[i]->adj, p->value);
         }
@@ -114,6 +132,13 @@ VocoderSynthUI::VocoderSynthUI (LV2UI_Write_Function write_function, LV2UI_Contr
         controls[i]->data = p->data;
         controls[i]->func.value_changed_callback = valueChangedCallback;
     }
+
+    for(int i=0;i<N_LABELS;i++){
+        LblProps *p = &lblProps[i];
+        Widget_t *l = add_label(box, p->label, p->x, p->y,
+            p->width, p->height);
+    }
+
 
     widget_show_all (box);
 }
@@ -160,8 +185,39 @@ void VocoderSynthUI::valueChangedCallback (void* obj, void* data)
 void VocoderSynthUI::exposeCallback (void* obj, void* data)
 {
     Widget_t* widget = static_cast<Widget_t*>(obj);
-    cairo_set_source_surface (widget->crb, widget->image, 0, 0);
+    cairo_set_source_rgb (widget->crb, 0.25, 0.25, 0.25 );
     cairo_paint (widget->crb);
+}
+
+void VocoderSynthUI::set_colors(Xputty *app) {
+    app->color_scheme->normal = (Colors){
+         /* cairo/ r / g / b / a /  */
+         /*fg*/{ 0.85, 0.85, 0.85, 1.0},
+         /*bg*/{ 0.3, 0.4, 0.5, 1.0},
+         /*base*/{ 0.0, 0.0, 0.0, 0.2},
+         /*text*/{ 0.9, 0.9, 0.9, 1.0},
+         /*shadow*/{ 0.0, 0.0, 0.0, 0.2}};
+
+    app->color_scheme->prelight = (Colors){
+        /*fg*/{ 1.0, 1.0, 1.0, 1.0},
+        /*bg*/{ 0.25, 0.25, 0.25, 1.0},
+        /*base*/{ 0.1, 0.1, 0.1, 0.4},
+        /*text*/{ 1.0, 1.0, 1.0, 1.0},
+        /*shadow*/{ 0.0, 0.0, 0.0, 0.2}};
+
+    app->color_scheme->selected = (Colors){
+        /*fg*/{ 0.9, 0.9, 0.9, 1.0},
+        /*bg*/{ 0.2, 0.2, 0.2, 1.0},
+        /*base*/{ 0.8, 0.18, 0.18, 0.2},
+        /*text*/{ 1.0, 1.0, 1.0, 1.0},
+        /*shadow*/{ 0.0, 0.0, 0.0, 0.2}};
+
+    app->color_scheme->active = (Colors){
+        /*fg*/{ 1.0, 1.0, 1.0, 1.0},
+        /*bg*/{ 0.0, 0.0, 0.0, 1.0},
+        /*base*/{ 0.68, 0.28, 0.28, 0.5},
+        /*text*/{ 0.75, 0.75, 0.75, 1.0},
+        /*shadow*/{ 0.0, 0.0, 0.0, 0.2}};
 }
 
 static LV2UI_Handle instantiate(const struct LV2UI_Descriptor *descriptor, const char *plugin_uri, const char *bundle_path, LV2UI_Write_Function write_function, LV2UI_Controller controller, LV2UI_Widget *widget, const LV2_Feature *const *features)

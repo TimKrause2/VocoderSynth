@@ -25,4 +25,5 @@ public:
     void portEvent(uint32_t port_index, uint32_t buffer_size, uint32_t format, const void *buffer);
     static void valueChangedCallback (void* obj, void* data);
     static void exposeCallback (void* obj, void* data);
+    void set_colors(Xputty * app);
 };
