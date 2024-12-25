@@ -5,6 +5,7 @@
 #include <lv2/lv2plug.in/ns/extensions/ui/ui.h>
 #include "xputty.h"
 #include "xwidget.h"
+#include "VocoderSynth.h"
 
 class VocoderSynthUI
 {
@@ -12,6 +13,7 @@ private:
     LV2UI_Write_Function write_function;
     LV2UI_Controller controller;
     Widget_t* dial;
+    Widget_t* controls[CONTROL_NCONTROLS];
     Widget_t* box;
     Xputty main;
 

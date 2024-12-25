@@ -7,23 +7,114 @@
 #include "xwidget.h"
 #include "xwidgets.h"
 
+enum CtlTypes
+{
+    CTYPE_KNOB,
+    CTYPE_CBUTTON,
+};
+
+struct CtlProps
+{
+    CtlTypes ctlType;
+    int data;
+    const char *label;
+    int x;
+    int y;
+    int width;
+    int height;
+    float std_value;
+    float value;
+    float min_value;
+    float max_value;
+    float step;
+    CL_type cl_type;
+};
+
+CtlProps ctlProps[CONTROL_NCONTROLS] =
+{
+    {
+        CTYPE_CBUTTON, PORT_CONTROL + CONTROL_RAW_ENABLE,
+        "Raw Enable",
+        0, 0, 100, 50,
+        0.0f, 1.0f, 0.0f, 0.0f, 0.0f, CL_CONTINUOS
+    },
+    {
+        CTYPE_CBUTTON, PORT_CONTROL + CONTROL_VOICE_ENABLE,
+        "Voice Enable",
+        100, 0, 100, 50,
+        0.0f, 0.0f, 0.0f, 0.0f, 0.0f, CL_CONTINUOS
+    },
+    {
+        CTYPE_KNOB, PORT_CONTROL + CONTROL_VOICE_IMPULSE_GAIN,
+        "Impulse Gain",
+        100, 50, 50, 50,
+        20.0f, 20.0f, 0.0f, 30.0f, 0.001f, CL_CONTINUOS
+    },
+    {
+        CTYPE_KNOB, PORT_CONTROL + CONTROL_VOICE_NOISE_GAIN,
+        "Noise Gain",
+        150, 50, 50, 50,
+        0.0f, 0.0f, -30.0f, 0.0f, 0.001f, CL_CONTINUOS
+    },
+    {
+        CTYPE_KNOB, PORT_CONTROL + CONTROL_VOICE_PITCH_OFFSET,
+        "Pitch Shift",
+        125, 100, 50, 50,
+        0.0f, 0.0f, -12.0f, 12.0f, 0.01f, CL_CONTINUOS
+    },
+    {
+        CTYPE_CBUTTON, PORT_CONTROL + CONTROL_SYNTH_ENABLE,
+        "Synth Enable",
+        200, 0, 100, 50,
+        0.0f, 0.0f, 0.0f, 0.0f, 0.0f, CL_CONTINUOS
+    },
+    {
+        CTYPE_KNOB, PORT_CONTROL + CONTROL_SYNTH_GAIN,
+        "Synth Gain",
+        200, 50, 50, 50,
+        20.0f, 20.0f, 0.0f, 30.0f, 0.001f, CL_CONTINUOS
+    },
+    {
+        CTYPE_KNOB, PORT_CONTROL + CONTROL_SYNTH_BEND_RANGE,
+        "Pitch Bend",
+        250, 50, 50, 50,
+        0.0f, 0.0f, 0.0f, 12.0f, 0.01f, CL_CONTINUOS
+    }
+};
+
+
+
+
+
+
+
 VocoderSynthUI::VocoderSynthUI (LV2UI_Write_Function write_function, LV2UI_Controller controller, void* parentXWindow, std::string bundlePath):
     write_function(write_function),
     controller(controller)
 {
     main_init (&main);
-    box = create_window (&main, reinterpret_cast<Window>(parentXWindow), 0, 0, 240, 200);
+    box = create_window (&main, reinterpret_cast<Window>(parentXWindow), 0, 0, 300, 150);
     box->parent_struct = this;
-    box->label = "MyAmp_Xputty";
-    std::string filename = bundlePath + "/Plugin.png";
-    widget_get_png_from_file (box, filename.c_str());
-    box->func.expose_callback = exposeCallback;
+    box->label = "VocoderSynth";
 
-    dial = add_knob (box, "", 80, 50, 100, 100);
-    dial->parent_struct = this;
-    dial->data = 2;
-    dial->func.value_changed_callback = valueChangedCallback;
-    set_adjustment (dial->adj, 1.0, 1.0, 0.0, 2.0, 0.01, CL_CONTINUOS);
+    for(int i=0;i<CONTROL_NCONTROLS;i++){
+        CtlProps *p = &ctlProps[i];
+        if(p->ctlType==CTYPE_KNOB){
+            controls[i] = add_knob(box,
+                p->label, p->x, p->y, p->width, p->height);
+            set_adjustment(controls[i]->adj,
+                p->std_value, p->value, p->min_value, p->max_value,
+                p->step, p->cl_type);
+        }else if(p->ctlType==CTYPE_CBUTTON){
+            controls[i] = add_check_button(box,
+                p->label, p->x, p->y, p->width, p->height);
+            adj_set_value(controls[i]->adj, p->value);
+        }
+        controls[i]->parent_struct = this;
+        controls[i]->data = p->data;
+        controls[i]->func.value_changed_callback = valueChangedCallback;
+    }
+
     widget_show_all (box);
 }
 
@@ -47,12 +138,10 @@ void VocoderSynthUI::portEvent(uint32_t port_index, uint32_t buffer_size, uint32
     if (format == 0)
     {
         const float value = *static_cast<const float*>(buffer);
-        switch (port_index)
+        if(port_index>=PORT_CONTROL &&
+            port_index<PORT_CONTROL+CONTROL_NCONTROLS)
         {
-            case 2:     adj_set_value (dial->adj, value);
-                        break;
-
-            default:    break;
+            adj_set_value(controls[port_index - PORT_CONTROL]->adj, value);
         }
     }
 }
@@ -63,8 +152,8 @@ void VocoderSynthUI::valueChangedCallback (void* obj, void* data)
     VocoderSynthUI* ui = static_cast<VocoderSynthUI*>(widget->parent_struct);
     if (ui)
     {
-        float gain = adj_get_value (widget->adj);
-        ui->write_function (ui->controller, 2, sizeof(gain), 0, &gain);
+        float value = adj_get_value (widget->adj);
+        ui->write_function (ui->controller, widget->data, sizeof(value), 0, &value);
     }
 }
 
@@ -77,7 +166,7 @@ void VocoderSynthUI::exposeCallback (void* obj, void* data)
 
 static LV2UI_Handle instantiate(const struct LV2UI_Descriptor *descriptor, const char *plugin_uri, const char *bundle_path, LV2UI_Write_Function write_function, LV2UI_Controller controller, LV2UI_Widget *widget, const LV2_Feature *const *features)
 {
-    if (strcmp (plugin_uri, "https://github.com/sjaehn/lv2tutorial/myAmp_Xputty") != 0) return nullptr;
+    if (strcmp (plugin_uri, "https://twkrause.ca/plugins/VocoderSynth") != 0) return nullptr;
     
     void* parentXWindow = nullptr;
     for (int i = 0; features[i]; ++i)
@@ -131,7 +220,7 @@ static const void * extension_data (const char *uri)
 
 static const LV2UI_Descriptor ui_descriptor =
 {
-    "https://github.com/sjaehn/lv2tutorial/myAmp_Xputty#ui",
+    "https://twkrause.ca/plugins/VocoderSynth#ui",
     instantiate,
     cleanup,
     port_event,

@@ -20,8 +20,15 @@
 @prefix urid:  <http://lv2plug.in/ns/ext/urid#> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 
+<https://twkrause.ca/plugins/VocoderSynth#ui>
+	a ui:X11UI ;
+	lv2:binary <VocoderSynthUI.so> ;
+    lv2:requiredFeature ui:idleInterface ;
+    lv2:extensionData ui:idleInterface .
+
 <https://twkrause.ca/plugins/VocoderSynth>
     a lv2:Plugin ;
+    ui:ui <https://twkrause.ca/plugins/VocoderSynth#ui> ;
     doap:name "VocoderSynth" ;
     doap:description "VocoderSynth" ;
     lv2:minorVersion 0 ;
