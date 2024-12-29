@@ -9,20 +9,23 @@ OBJECTS=$(SOURCES:.cpp=.o)
 all: VocoderSynth.so VocoderSynthUI.so
 
 VocoderSynth.so:$(OBJECTS)
-	gcc -shared -o VocoderSynth.so $(OBJECTS) -lm
+	g++ -shared -o VocoderSynth.so $(OBJECTS) -lm
 
-VocoderSynthUI.so:VocoderSynthUI.cpp
+LIBXPUTTY=libxputty/libxputty
+
+
+VocoderSynthUI.so:VocoderSynthUI.cpp $(LIBXPUTTY)/libxputty.a
 	g++ -shared -fPIC -o VocoderSynthUI.so \
 	`pkg-config --cflags lv2 cairo x11` \
-	-Ilibxputty/libxputty/include \
+	-I$(LIBXPUTTY)/include \
 	VocoderSynthUI.cpp \
 	`pkg-config --libs lv2 cairo x11` \
-	-Llibxputty/libxputty -lxputty
+	-L$(LIBXPUTTY) -lxputty
 
 libxputty/Makefile:
 	git submodule update --init --recursive
 	
-libxputty/libxputty/libxputty.a:libxputty/Makefile
+$(LIBXPUTTY)/libxputty.a:libxputty/Makefile
 	make -C libxputty
 
 install:VocoderSynth.lv2 all

@@ -35,50 +35,50 @@ CtlProps ctlProps[CONTROL_NCONTROLS] =
     {
         CTYPE_BUTTON, PORT_CONTROL + CONTROL_RAW_ENABLE,
         "Raw Enable",
-        0, 0, 120, 30,
+        0, 0, 119, 29,
         0.0f, 1.0f, 0.0f, 0.0f, 0.0f, CL_CONTINUOS
     },
     {
         CTYPE_BUTTON, PORT_CONTROL + CONTROL_VOICE_ENABLE,
         "Voice Enable",
-        120, 0, 120, 30,
+        120, 0, 119, 29,
         0.0f, 0.0f, 0.0f, 0.0f, 0.0f, CL_CONTINUOS
     },
     {
         CTYPE_KNOB, PORT_CONTROL + CONTROL_VOICE_IMPULSE_GAIN,
-        "Impulse Gain",
-        120, 50, 60, 80,
-        20.0f, 20.0f, 0.0f, 30.0f, 0.001f, CL_CONTINUOS
+        "Impulse",
+        120, 50, 59, 79,
+        20.0f, 20.0f, 0.0f, 30.0f, 0.1f, CL_CONTINUOS
     },
     {
         CTYPE_KNOB, PORT_CONTROL + CONTROL_VOICE_NOISE_GAIN,
-        "Noise Gain",
-        180, 50, 60, 80,
-        0.0f, 0.0f, -30.0f, 0.0f, 0.001f, CL_CONTINUOS
+        "Noise",
+        180, 50, 59, 79,
+        0.0f, 0.0f, -30.0f, 0.0f, 0.1f, CL_CONTINUOS
     },
     {
         CTYPE_KNOB, PORT_CONTROL + CONTROL_VOICE_PITCH_OFFSET,
         "Pitch Shift",
-        150, 130, 60, 80,
-        0.0f, 0.0f, -12.0f, 12.0f, 0.01f, CL_CONTINUOS
+        150, 130, 59, 79,
+        0.0f, 0.0f, -12.0f, 12.0f, 0.1f, CL_CONTINUOS
     },
     {
         CTYPE_BUTTON, PORT_CONTROL + CONTROL_SYNTH_ENABLE,
         "Synth Enable",
-        240, 0, 120, 30,
+        240, 0, 119, 29,
         0.0f, 0.0f, 0.0f, 0.0f, 0.0f, CL_CONTINUOS
     },
     {
         CTYPE_KNOB, PORT_CONTROL + CONTROL_SYNTH_GAIN,
-        "Synth Gain",
-        240, 50, 60, 80,
-        20.0f, 20.0f, 0.0f, 30.0f, 0.001f, CL_CONTINUOS
+        "Gain",
+        240, 50, 59, 79,
+        20.0f, 20.0f, 0.0f, 30.0f, 0.1f, CL_CONTINUOS
     },
     {
         CTYPE_KNOB, PORT_CONTROL + CONTROL_SYNTH_BEND_RANGE,
-        "Pitch Bend",
-        300, 50, 60, 80,
-        0.0f, 0.0f, 0.0f, 12.0f, 0.01f, CL_CONTINUOS
+        "Bend",
+        300, 50, 59, 79,
+        0.0f, 0.0f, 0.0f, 12.0f, 0.1f, CL_CONTINUOS
     }
 };
 
@@ -93,13 +93,13 @@ struct LblProps
 LblProps lblProps[N_LABELS] =
 {
     {
-        "Raw Enable", 0, 30, 120, 20
+        "Raw Enable", 0, 30, 119, 19,
     },
     {
-        "Voice Enable", 120, 30, 120, 20
+        "Voice Enable", 120, 30, 119, 19,
     },
     {
-        "Synth Enable", 240, 30, 120, 20
+        "Synth Enable", 240, 30, 119, 19,
     }
 };
 
@@ -108,8 +108,6 @@ VocoderSynthUI::VocoderSynthUI (LV2UI_Write_Function write_function, LV2UI_Contr
     controller(controller)
 {
     main_init (&main);
-    set_colors(&main);
-    main.normal_font = 10;
     box = create_window (&main, reinterpret_cast<Window>(parentXWindow), 0, 0, 360, 210);
     box->parent_struct = this;
     box->label = "VocoderSynth";
@@ -187,37 +185,6 @@ void VocoderSynthUI::exposeCallback (void* obj, void* data)
     Widget_t* widget = static_cast<Widget_t*>(obj);
     cairo_set_source_rgb (widget->crb, 0.25, 0.25, 0.25 );
     cairo_paint (widget->crb);
-}
-
-void VocoderSynthUI::set_colors(Xputty *app) {
-    app->color_scheme->normal = (Colors){
-         /* cairo/ r / g / b / a /  */
-         /*fg*/{ 0.85, 0.85, 0.85, 1.0},
-         /*bg*/{ 0.3, 0.4, 0.5, 1.0},
-         /*base*/{ 0.0, 0.0, 0.0, 0.2},
-         /*text*/{ 0.9, 0.9, 0.9, 1.0},
-         /*shadow*/{ 0.0, 0.0, 0.0, 0.2}};
-
-    app->color_scheme->prelight = (Colors){
-        /*fg*/{ 1.0, 1.0, 1.0, 1.0},
-        /*bg*/{ 0.25, 0.25, 0.25, 1.0},
-        /*base*/{ 0.1, 0.1, 0.1, 0.4},
-        /*text*/{ 1.0, 1.0, 1.0, 1.0},
-        /*shadow*/{ 0.0, 0.0, 0.0, 0.2}};
-
-    app->color_scheme->selected = (Colors){
-        /*fg*/{ 0.9, 0.9, 0.9, 1.0},
-        /*bg*/{ 0.2, 0.2, 0.2, 1.0},
-        /*base*/{ 0.8, 0.18, 0.18, 0.2},
-        /*text*/{ 1.0, 1.0, 1.0, 1.0},
-        /*shadow*/{ 0.0, 0.0, 0.0, 0.2}};
-
-    app->color_scheme->active = (Colors){
-        /*fg*/{ 1.0, 1.0, 1.0, 1.0},
-        /*bg*/{ 0.0, 0.0, 0.0, 1.0},
-        /*base*/{ 0.68, 0.28, 0.28, 0.5},
-        /*text*/{ 0.75, 0.75, 0.75, 1.0},
-        /*shadow*/{ 0.0, 0.0, 0.0, 0.2}};
 }
 
 static LV2UI_Handle instantiate(const struct LV2UI_Descriptor *descriptor, const char *plugin_uri, const char *bundle_path, LV2UI_Write_Function write_function, LV2UI_Controller controller, LV2UI_Widget *widget, const LV2_Feature *const *features)

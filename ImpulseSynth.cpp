@@ -46,7 +46,7 @@ ImpulseSynth::ImpulseSynth(
             );
 
     if (missing){
-        std::cout << "map feature is missing" << std::endl;
+        //std::cout << "map feature is missing" << std::endl;
         throw;
     }
 
