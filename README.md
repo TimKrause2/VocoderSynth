@@ -1,1 +1,45 @@
 # VocoderSynth
+
+## Description
+
+VocoderSynth LV2 plugin is a Linear Predictive Coding based
+vocoder with 3 selectable inputs: raw audio, a voice
+controlled impulse and noise generator and a MIDI
+controlled synth of impulse generators.
+
+## Building Prerequisites
+
+In order to build VocoderSynth you need these prerequisites.
+
+- gcc
+- cairo-dev
+- x11-dev
+- make
+- pkgconfig
+- git
+
+## Clone and make
+
+In a terminal enter the following.
+
+```
+git clone https://github.com/TimKrause2/VocoderSynth.git
+cd VocoderSynth
+make
+make install
+```
+
+The install directory is `.lv2` in your home directory.
+
+
+## Controls
+
+- **Raw Enable** controls the raw audio input.
+- **Voice Enable** controls the voice controlled impulse and
+noise generator.
+- **Impulse** sets the gain of the impulses in dB.
+- **Noise** sets the gain of the noise in dB.
+- **Pitch Shift** sets the pitch offset of the impulse generator in semitones.
+- **Synth Enable** controls the MIDI impulse generator synth.
+- **Gain** sets the gain of the MIDI synth in dB.
+- **Bend** sets the pitch bend range of the MIDI synth in semitones.
