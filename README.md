@@ -1,4 +1,4 @@
-# VocoderSynth
+# VocoderSynth ![GPL license logo!](https://www.gnu.org/graphics/gplv3-or-later.png)
 
 ![Screenshot of VocoderSynth hosted by Ardour.!](https://github.com/TimKrause2/VocoderSynth/blob/main/screenshot.png "VocoderSynth in Ardour")
 
