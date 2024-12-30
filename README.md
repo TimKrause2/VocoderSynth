@@ -1,5 +1,7 @@
 # VocoderSynth
 
+![Screenshot of VocoderSynth hosted by Ardour.!](https://github.com/TimKrause2/VocoderSynth/blob/main/screenshot.png "VocoderSynth in Ardour")
+
 ## Description
 
 VocoderSynth LV2 plugin is a Linear Predictive Coding based
@@ -35,8 +37,7 @@ The install directory is `.lv2` in your home directory.
 ## Controls
 
 - **Raw Enable** controls the raw audio input.
-- **Voice Enable** controls the voice controlled impulse and
-noise generator.
+- **Voice Enable** controls the voice controlled impulse and noise generator.
 - **Impulse** sets the gain of the impulses in dB.
 - **Noise** sets the gain of the noise in dB.
 - **Pitch Shift** sets the pitch offset of the impulse generator in semitones.
