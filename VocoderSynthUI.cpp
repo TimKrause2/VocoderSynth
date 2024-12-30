@@ -48,13 +48,13 @@ CtlProps ctlProps[CONTROL_NCONTROLS] =
         CTYPE_KNOB, PORT_CONTROL + CONTROL_VOICE_IMPULSE_GAIN,
         "Impulse",
         120, 50, 59, 79,
-        20.0f, 20.0f, 0.0f, 30.0f, 0.1f, CL_CONTINUOS
+        25.0f, 25.0f, 0.0f, 30.0f, 0.1f, CL_CONTINUOS
     },
     {
         CTYPE_KNOB, PORT_CONTROL + CONTROL_VOICE_NOISE_GAIN,
         "Noise",
         180, 50, 59, 79,
-        0.0f, 0.0f, -30.0f, 0.0f, 0.1f, CL_CONTINUOS
+        3.0f, 3.0f, 0.0f, 30.0f, 0.1f, CL_CONTINUOS
     },
     {
         CTYPE_KNOB, PORT_CONTROL + CONTROL_VOICE_PITCH_OFFSET,
