@@ -13,12 +13,18 @@ controlled synth of impulse generators.
 
 In order to build VocoderSynth you need these prerequisites.
 
-- gcc
-- cairo-dev
-- x11-dev
+- g++ and gcc
+- libcairo2-dev
+- libx11-dev
 - make
-- pkgconfig
+- pkg-config
 - git
+
+On Ubuntu this can be done by the following.
+
+```
+sudo apt install g++ gcc make libcairo2-dev libx11-dev pkg-config git
+```
 
 ## Clone and make
 
