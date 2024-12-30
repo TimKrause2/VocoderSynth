@@ -43,6 +43,7 @@
             a doap:Version ;
             doap:revision "1.0.0" ;
     ] ;
+    doap:license <https://www.gnu.org/licenses/gpl-3.0.rdf> ;
     lv2:optionalFeature
             lv2:hardRTCapable ;
     lv2:requiredFeature urid:map ;
