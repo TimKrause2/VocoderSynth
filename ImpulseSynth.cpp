@@ -59,7 +59,8 @@ ImpulseSynth::ImpulseSynth(
     VocoderSynth &plugin)
     :
     sample_rate(sample_rate),
-    plugin(plugin)
+    plugin(plugin),
+    pitch_bend(0.0f)
 {
     LV2_URID_Map* map;
     const char* missing = lv2_features_query
@@ -145,8 +146,8 @@ void ImpulseSynth::AllNotesOff(void)
 
 void ImpulseSynth::Bender(uint8_t lsb, uint8_t msb)
 {
-    short x = (lsb&0x7F)|((msb&0x7F)<<7);
-    pitch_bend = (float)(x-8912)/8192.0f;
+    short x = (lsb&0x7F)|((short)(msb&0x7F)<<7);
+    pitch_bend = ((float)x-8192.0f)/8192.0f;
 }
 
 
